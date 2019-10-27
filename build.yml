@@ -1,0 +1,22 @@
+---
+- name: Prepare for build
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+  - name: Read users from CSV file and return a list of dictionaries
+    read_csv:
+      path: gall-lt1-swa.csv
+    register: switches  
+  - name: Create build directories
+    shell: | 
+      mkdir -p tmp/{{item.hostname}}
+      touch tmp/{{item.hostname}}/extra-{{item.hostname}}.txt
+    loop: "{{ switches.list }}"
+
+- name: Generate configs
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles:
+    - base

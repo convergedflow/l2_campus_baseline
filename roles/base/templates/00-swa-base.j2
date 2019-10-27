@@ -1,0 +1,122 @@
+!----CONFIGURATION BEGINS-----!
+
+alias COMMENT "This is per session, not saved in config"
+terminal width 150
+terminal length 50
+
+conf t
+
+hostname {{item.hostname}}
+
+console idle-timeout 300
+console idle-timeout serial-usb 300
+
+
+alias COMMENT "Interactive command"
+spanning-tree mode rapid-pvst
+spanning-tree bpdu-protection-timeout 300
+spanning-tree extend system-id
+spanning-tree
+
+mac-age-time 300
+ip arp-age 5
+
+crypto key generate ssh rsa bits 2048
+!-------------- COPY BREAK --------------!
+
+
+no ip ssh cipher 3des-cbc
+no ip ssh cipher rijndael-cbc@lysator.liu.se
+no ip ssh mac hmac-md5
+no ip ssh mac hmac-md5-96
+ip ssh
+
+vlan 1000
+   name "net-gall-lt1-vlan1000-mgmt"
+   ip address {{item.vlan1000}} 255.255.255.0
+   exit
+
+
+
+time timezone 0 daylight-time-rule western-europe
+timesync ntp
+ntp unicast
+ntp server {{item.ntp1}}
+ntp server {{item.ntp2}}
+ntp enable
+
+mvrp disable
+
+dldp enable
+dldp unidirectional-shutdown auto
+
+banner motd ^
+##################################################################
+# This system is for authorized use only. Unauthorized or improper
+# use of this system may result in civil or criminal penalties. By
+# continuing to use this system you acknowledge your consent to
+# these conditions of use.
+##################################################################
+^
+
+logging {{item.syslog1}}
+logging severity info
+
+no telnet-server
+no web-management
+no tftp server
+
+include-credentials
+Y
+Y
+
+alias COMMENT "Interactive command"
+encrypt-credentials
+Y
+
+password minimum-length 8
+password complexity user-name-check
+password complexity repeat-char-check
+password complexity repeat-password-check
+password composition lowercase 2
+password composition uppercase 2
+password composition specialcharacter 2
+password composition number 2
+
+encrypted-password manager user-name "{{item.localadmin1}}" "{{item.localadminpw1}}"
+
+no snmp-server community "public"
+snmp-server community {{item.snmpcomm}} operator
+snmp-server contact {{item.snmpcon}} location "{{item.snmploc}}"
+snmp-server response-source dst-ip-of-request
+
+
+vlan 666
+   name "BLACKHOLE_VLAN"
+   untagged all
+   no ip address
+   disable layer3
+   exit
+
+vlan 900
+  name "NATIVE_VLAN"
+  no ip address
+  disable layer3
+  exit
+
+vlan 1
+   name "DEFAULT_VLAN"
+   no ip address
+   no ipv6 enable
+   no ipv6 address dhcp full
+   disable layer3
+   forbid all
+   exit
+
+no alias COMMENT
+
+end
+
+write memory
+
+!----CONFIGURATION ENDS-----!
