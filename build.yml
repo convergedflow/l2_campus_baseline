@@ -6,7 +6,7 @@
   tasks:
   - name: Read users from CSV file and return a list of dictionaries
     read_csv:
-      path: gall-lt1-swa.csv
+      path: switch_list.csv
     register: switches  
   - name: Create build directories
     shell: | 
