@@ -1,8 +1,8 @@
 ---
-- name: Read users from CSV file and return a list of dictionaries
+- name: Read switches from CSV file and return a list of dictionaries
   read_csv:
-    path: /home/owendev/work/gall/net4/gall-lt1-swa.csv
+    path: /home/owendev/work/xyz/net4/switch_list.csv
   register: switches
 - name: Generate configuration files
-  template: src=00-swa-base.j2 dest=/home/owendev/work/gall/net4/tmp/{{item.hostname}}/00-base-{{item.hostname}}.txt
+  template: src=00-swa-base.j2 dest=/home/owendev/work/xyz/net4/tmp/{{item.hostname}}/00-base-{{item.hostname}}.txt
   loop: "{{ switches.list }}"
